@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+
+    android:id="@+id/listView_layout"
+    android:clickable="true"
+    android:background="#000">
+
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/channel_list"
+            android:background="@color/button_background_tint">
+
+        </ListView>
+
+
+</FrameLayout>

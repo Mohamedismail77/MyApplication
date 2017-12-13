@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.m_ismail.myapplication.Player"
+    android:orientation="horizontal"
     >
 
-    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+  <!-- <com.google.android.exoplayer2.ui.SimpleExoPlayerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
          android:orientation="horizontal"
         android:id="@+id/exo_player"></com.google.android.exoplayer2.ui.SimpleExoPlayerView>
+    -->
 
-</android.support.constraint.ConstraintLayout>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:id="@+id/detail_container"
+        android:background="#000"></FrameLayout>
+
+    <SurfaceView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/surface_player"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:onClick="listView"
+        />
+
+
+
+</LinearLayout>
