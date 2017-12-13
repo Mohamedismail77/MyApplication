@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifest;
@@ -82,20 +83,18 @@ public class Player extends AppCompatActivity implements ChannelListFragment.Cal
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, "MyApplication"), (TransferListener<? super DataSource>) bandwidthMeter);
 // Produces Extractor instances for parsing the media data.
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
-        HlsMediaSource videoSource = new HlsMediaSource(Uri.parse("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8"),
-                dataSourceFactory, null, null);
+        SsMediaSource videoSource = new SsMediaSource(Uri.parse("https://storage.googleapis.com/wvmedia/clear/hevc/tears/tears_sd.mpd"),dataSourceFactory,
+                new DefaultSsChunkSource.Factory(dataSourceFactory), mainHandler, null);
 
-        SsManifestParser uri = new SsManifestParser();
+       // MediaSource videoSource = new ExtractorMediaSource(Uri.parse("https://storage.googleapis.com/wvmedia/clear/vp9/tears/tears.mpd"),
+         //       dataSourceFactory,extractorsFactory, null, null);
 
-        SsMediaSource ssMediaSource = new SsMediaSource(uri.parse("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8",),
-                                        dataSourceFactory,null,null);
 // Prepare the player with the source.
         player.prepare(videoSource);
         player.setPlayWhenReady(true);
 
-        //SimpleExoPlayerView simpleExoPlayerView = (SimpleExoPlayerView) findViewById(R.id.exo_player);
-        //simpleExoPlayerView.setPlayer(player);
 
         SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_player);
         player.setVideoSurfaceView(surfaceView);
