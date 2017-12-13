@@ -20,7 +20,8 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:id="@+id/detail_container"
-        android:background="#000"></FrameLayout>
+        android:background="#000"
+        ></FrameLayout>
 
     <SurfaceView
         android:layout_width="match_parent"

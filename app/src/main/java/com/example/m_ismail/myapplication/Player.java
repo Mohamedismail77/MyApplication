@@ -26,6 +26,8 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifest;
+import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifestParser;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
@@ -43,11 +45,16 @@ import org.w3c.dom.Text;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
 
-public class Player extends AppCompatActivity {
+public class Player extends AppCompatActivity implements ChannelListFragment.Callback{
 
     public TextView mtextView;
     public FrameLayout mframe;
     public ArrayList<ChannelDetails> channels = new ArrayList<>();
+
+
+    public Fragment fb;
+    public FragmentManager fm;
+    public FragmentTransaction ft;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +85,11 @@ public class Player extends AppCompatActivity {
 
         HlsMediaSource videoSource = new HlsMediaSource(Uri.parse("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8"),
                 dataSourceFactory, null, null);
+
+        SsManifestParser uri = new SsManifestParser();
+
+        SsMediaSource ssMediaSource = new SsMediaSource(uri.parse("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8",),
+                                        dataSourceFactory,null,null);
 // Prepare the player with the source.
         player.prepare(videoSource);
         player.setPlayWhenReady(true);
@@ -90,6 +102,7 @@ public class Player extends AppCompatActivity {
 
 
         //mtextView = (TextView) findViewById(R.id.text_test);
+        mframe = (FrameLayout) findViewById(R.id.detail_container);
 
 
     }
@@ -97,14 +110,21 @@ public class Player extends AppCompatActivity {
 
     public void listView(View view) {
 
-
-        Fragment fb = new ChannelListFragment();
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.detail_container, fb);
-        ft.commit();
+         fb = new ChannelListFragment();
+         fm = getFragmentManager();
+         ft = fm.beginTransaction().setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+         ft.replace(R.id.detail_container, fb);
+         ft.commit();
 
     }
 
 
+    @Override
+    public void onItemSelected() {
+
+
+        getFragmentManager().beginTransaction().remove(fb).commit();
+
+
+    }
 }

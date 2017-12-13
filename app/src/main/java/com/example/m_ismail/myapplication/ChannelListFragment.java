@@ -1,5 +1,6 @@
 package com.example.m_ismail.myapplication;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,6 +22,9 @@ import java.util.ArrayList;
 public class ChannelListFragment extends Fragment {
 
     public ArrayList<ChannelDetails> channels = new ArrayList<>();
+    public Callback mCallback;
+
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,6 +64,7 @@ public class ChannelListFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Toast.makeText(getActivity(), channels.get(i).getmTitle(),Toast.LENGTH_LONG).show();
+                mCallback.onItemSelected();
 
             }
         });
@@ -70,8 +75,20 @@ public class ChannelListFragment extends Fragment {
     }
 
 
+
+
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallback = (Callback) activity;
     }
+
+    public interface Callback{
+
+        public void onItemSelected();
+
+    }
+
+
+
 }
