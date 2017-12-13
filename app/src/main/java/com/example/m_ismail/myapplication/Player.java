@@ -17,12 +17,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.dash.DashChunkSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsChunkSource;
@@ -38,6 +43,7 @@ import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 
@@ -51,11 +57,15 @@ public class Player extends AppCompatActivity implements ChannelListFragment.Cal
     public TextView mtextView;
     public FrameLayout mframe;
     public ArrayList<ChannelDetails> channels = new ArrayList<>();
-
+    public SimpleExoPlayer player;
+    public MediaSource mediaSource;
 
     public Fragment fb;
     public FragmentManager fm;
     public FragmentTransaction ft;
+
+    private static final DefaultBandwidthMeter BANDWIDTH_METER =
+            new DefaultBandwidthMeter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,40 +75,24 @@ public class Player extends AppCompatActivity implements ChannelListFragment.Cal
 
 
 
-        // 1. Create a default TrackSelector
-        Handler mainHandler = new Handler();
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
+        TrackSelection.Factory adaptiveTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
 
-        //2. Create the player
-        SimpleExoPlayer player =
-                ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        player = ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(this),
+                new DefaultTrackSelector(adaptiveTrackSelectionFactory),
+                new DefaultLoadControl());
 
 
-        // Measures bandwidth during playback. Can be null if not required.
-// Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
-                Util.getUserAgent(this, "MyApplication"), (TransferListener<? super DataSource>) bandwidthMeter);
-// Produces Extractor instances for parsing the media data.
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-
-        SsMediaSource videoSource = new SsMediaSource(Uri.parse("https://storage.googleapis.com/wvmedia/clear/hevc/tears/tears_sd.mpd"),dataSourceFactory,
-                new DefaultSsChunkSource.Factory(dataSourceFactory), mainHandler, null);
-
-       // MediaSource videoSource = new ExtractorMediaSource(Uri.parse("https://storage.googleapis.com/wvmedia/clear/vp9/tears/tears.mpd"),
-         //       dataSourceFactory,extractorsFactory, null, null);
-
-// Prepare the player with the source.
-        player.prepare(videoSource);
         player.setPlayWhenReady(true);
 
 
         SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surface_player);
         player.setVideoSurfaceView(surfaceView);
 
+        Uri uri = Uri.parse("https://storage.googleapis.com/wvmedia/clear/h264/tears/tears_sd.mpd");
+        mediaSource = buildMediaSource(uri);
+        player.prepare(mediaSource, true, false);
 
         //mtextView = (TextView) findViewById(R.id.text_test);
         mframe = (FrameLayout) findViewById(R.id.detail_container);
@@ -119,11 +113,26 @@ public class Player extends AppCompatActivity implements ChannelListFragment.Cal
 
 
     @Override
-    public void onItemSelected() {
+    public void onItemSelected(ChannelDetails channelDetails) {
 
+        Uri uri = Uri.parse(channelDetails.getmChannelLink());
+        mediaSource = buildMediaSource(uri);
+        player.prepare(mediaSource, true, false);
 
         getFragmentManager().beginTransaction().remove(fb).commit();
 
 
     }
+
+    private MediaSource buildMediaSource(Uri uri) {
+
+        DataSource.Factory dataSourceFactory =
+                new DefaultHttpDataSourceFactory("ua", BANDWIDTH_METER);
+        DashChunkSource.Factory dashChunkSourceFactory =
+                new DefaultDashChunkSource.Factory(dataSourceFactory);
+
+        return new DashMediaSource(uri, dataSourceFactory,
+                dashChunkSourceFactory, null, null);
+    }
+
 }

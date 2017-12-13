@@ -43,13 +43,13 @@ public class ChannelListFragment extends Fragment {
         ChannelDetails channel_3 = new ChannelDetails();
 
         channel_1.setmTitle("Apple TV");
-        channel_1.setmChannelLink("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8");
+        channel_1.setmChannelLink("http://demos.webmproject.org/exoplayer/glass.mp4");
 
         channel_2.setmTitle("Big Buck Bunny");
-        channel_2.setmChannelLink("rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov");
+        channel_2.setmChannelLink("https://storage.googleapis.com/exoplayer-test-media-1/gen-3/screens/dash-vod-single-segment/video-137.mp4");
 
         channel_3.setmTitle("Cyber Tech Media");
-        channel_3.setmChannelLink("http://www.cybertechmedia.com/samples/raycharles.wmv");
+        channel_3.setmChannelLink("https://html5demos.com/assets/dizzy.mp4");
 
         channels.add(channel_1);
         channels.add(channel_2);
@@ -63,8 +63,7 @@ public class ChannelListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Toast.makeText(getActivity(), channels.get(i).getmTitle(),Toast.LENGTH_LONG).show();
-                mCallback.onItemSelected();
+                mCallback.onItemSelected(channels.get(i));
 
             }
         });
@@ -85,7 +84,7 @@ public class ChannelListFragment extends Fragment {
 
     public interface Callback{
 
-        public void onItemSelected();
+        public void onItemSelected(ChannelDetails channelDetails);
 
     }
 
